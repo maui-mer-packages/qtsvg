@@ -47,7 +47,10 @@ This package contains the SVG image format plugin
 %build
 export QTDIR=/usr/share/qt5
 touch .git
-%qmake5 QT.widgets.name= DEFINES+=QT_NO_WIDGETS
+# Can't build without QtWidgets, see https://bugs.kde.org/show_bug.cgi?id=336028
+# also this might be the cause why Hawaii doesn't show any icon
+#%qmake5 QT.widgets.name= DEFINES+=QT_NO_WIDGETS
+%qmake5
 make %{_smp_mflags}
 
 %install
@@ -88,4 +91,4 @@ find %{buildroot}%{_libdir} -type f -name "*_*Plugin.cmake" \
 %files plugin-imageformat-svg
 %defattr(-,root,root,-)
 %{_libdir}/qt5/plugins/imageformats/lib*svg.so
-
+%{_libdir}/qt5/plugins/iconengines/*.so
