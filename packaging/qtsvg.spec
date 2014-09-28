@@ -1,11 +1,14 @@
-Name:       qt5-qtsvg
-Summary:    Qt scripting module
-Version:    5.0.2
-Release:    1%{?dist}
+# Package prefix
+%define pkgname qt5-qtsvg
+
+Name:       qtsvg
+Summary:    Qt SVG module
+Version:    5.3.2
+Release:    1
 Group:      Qt/Qt
 License:    LGPLv2.1 with exception or GPLv3
-URL:        http://qt.nokia.com
-Source0:    %{name}-%{version}.tar.bz2
+URL:        http://qt.io
+Source0:    %{name}-%{version}.tar.xz
 BuildRequires:  qt5-qtcore-devel
 BuildRequires:  qt5-qtgui-devel
 BuildRequires:  qt5-qtxml-devel
@@ -17,32 +20,47 @@ BuildRequires:  fdupes
 Qt is a cross-platform application and UI framework. Using Qt, you can
 write web-enabled applications once and deploy them across desktop,
 mobile and embedded systems without rewriting the source code.
-.
-This package contains the SVG module
+
+This package contains the SVG module.
 
 
-%package devel
-Summary:    Qt SVG - development files
+%package -n qt5-qtsvg
+Summary:    Qt SVG module
 Group:      Qt/Qt
-Requires:   %{name} = %{version}-%{release}
 
-%description devel
+%description -n qt5-qtsvg
 Qt is a cross-platform application and UI framework. Using Qt, you can
 write web-enabled applications once and deploy them across desktop,
 mobile and embedded systems without rewriting the source code.
-.
-This package contains the SVG module development files
 
-%package plugin-imageformat-svg
+This package contains the SVG module.
+
+
+%package -n qt5-qtsvg-devel
+Summary:    Qt SVG - development files
+Group:      Qt/Qt
+Requires:   %{pkgname} = %{version}-%{release}
+
+%description -n qt5-qtsvg-devel
+Qt is a cross-platform application and UI framework. Using Qt, you can
+write web-enabled applications once and deploy them across desktop,
+mobile and embedded systems without rewriting the source code.
+
+This package contains the SVG module development files.
+
+
+%package -n qt5-qtsvg-plugin-imageformat-svg
 Summary:    Qt SVG image format plugin
 Group:      Qt/Qt
-Requires:   %{name} = %{version}-%{release}
+Requires:   %{pkgname} = %{version}-%{release}
 
-%description plugin-imageformat-svg
+%description -n qt5-qtsvg-plugin-imageformat-svg
 This package contains the SVG image format plugin
 
+
 %prep
-%setup -q -n %{name}-%{version}/upstream
+%setup -q -n %{name}-%{version}
+
 
 %build
 export QTDIR=/usr/share/qt5
@@ -53,33 +71,38 @@ touch .git
 %qmake5
 make %{_smp_mflags}
 
+
 %install
 rm -rf %{buildroot}
 %qmake5_install
+
 # Remove unneeded .la files
 rm -f %{buildroot}/%{_libdir}/*.la
+
 # Fix wrong path in prl files
 find %{buildroot}%{_libdir} -type f -name '*.prl' \
--exec sed -i -e "/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/" {} \;
-# these manage to really royally screw up cmake
+    -exec sed -i -e "/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/" {} \;
+
+# These manage to really royally screw up cmake
 find %{buildroot}%{_libdir} -type f -name "*_*Plugin.cmake" \
--exec rm {} \;
-#
+    -exec rm {} \;
+
+
 %fdupes %{buildroot}/%{_includedir}
 
 
-%post
+%post -n qt5-qtsvg
 /sbin/ldconfig
-%postun
+%postun -n qt5-qtsvg
 /sbin/ldconfig
 
 
-%files
+%files -n qt5-qtsvg
 %defattr(-,root,root,-)
 %{_libdir}/libQt5Svg.so.5
 %{_libdir}/libQt5Svg.so.5.*
 
-%files devel
+%files -n qt5-qtsvg-devel
 %defattr(-,root,root,-)
 %{_libdir}/libQt5Svg.so
 %{_libdir}/libQt5Svg.prl
@@ -88,7 +111,7 @@ find %{buildroot}%{_libdir} -type f -name "*_*Plugin.cmake" \
 %{_datadir}/qt5/mkspecs/
 %{_libdir}/cmake/
 
-%files plugin-imageformat-svg
+%files -n qt5-qtsvg-plugin-imageformat-svg
 %defattr(-,root,root,-)
 %{_libdir}/qt5/plugins/imageformats/lib*svg.so
 %{_libdir}/qt5/plugins/iconengines/*.so
